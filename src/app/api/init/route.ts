@@ -1,12 +1,12 @@
 import { NextResponse, NextRequest } from 'next/server'
 
 export async function GET(
-    request: NextRequest,
+  request: NextRequest,
 ) {
   try {
-    
-    if(request.headers.get('cookie')){
-        return NextResponse.json({ success: true, message: '已初始化' })
+
+    if (request.headers.get('cookie')) {
+      return NextResponse.json({ success: true, message: '已初始化' })
     }
 
     // 访问 B 站首页获取初始 Cookie
@@ -19,7 +19,7 @@ export async function GET(
     // 获取所有 Set-Cookie 响应头
     const cookieHeader = response.headers.get('set-cookie')
     const cookies = cookieHeader ? cookieHeader.split(',') : []
-    
+
     if (!cookies || cookies.length === 0) {
       throw new Error('未能获取到 Cookie')
     }
@@ -32,7 +32,7 @@ export async function GET(
       // 解析 Cookie 字符串
       const [mainPart] = cookie.split(';')
       const [name, value] = mainPart.split('=')
-      
+
       // 设置 Cookie
       res.cookies.set(name, value, {
         // Cookie 配置
