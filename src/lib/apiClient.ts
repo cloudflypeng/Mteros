@@ -7,7 +7,7 @@ type ApiOptions = {
 class ApiClient {
   async request(path: string, options: ApiOptions = {}) {
     const { params, body, method = 'GET' } = options
-    
+
     const url = new URL(`/api/bilibili/${path}`, window.location.origin)
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
@@ -37,20 +37,20 @@ class ApiClient {
     // 搜索视频
     // template: https://api.bilibili.com/x/web-interface/search/type?page=1&page_size=42&platform=pc&highlight=1&keyword=re&search_type=video&preload=true&com2co=true
     search: async (keyword: string) => {
-        const res = await this.request('x/web-interface/search/type', {
-          params: { keyword, search_type: 'video', page: '1', page_size: '42', platform: 'pc', highlight: '1', preload: 'true', com2co: 'true' }
-        })
-        return res.data.result
+      const res = await this.request('x/web-interface/search/type', {
+        params: { keyword, search_type: 'video', page: '1', page_size: '42', platform: 'pc', highlight: '1', preload: 'true', com2co: 'true' }
+      })
+      return res.data.result
     },
 
     // 获取视频信息
-    getInfo: (bvid: string) => 
+    getInfo: (bvid: string) =>
       this.request('x/web-interface/view', {
         params: { bvid }
       }),
 
     // 获取播放地址
-    getPlayUrl: (bvid: string, cid: string) => 
+    getPlayUrl: (bvid: string, cid: string) =>
       this.request('x/player/playurl', {
         params: { bvid, cid }
       }),
@@ -58,20 +58,24 @@ class ApiClient {
 
   user = {
     // 获取用户信息
-    getInfo: (uid: number) => 
+    getInfo: (uid: number) =>
       this.request('x/space/acc/info', {
         params: { mid: uid.toString() }
       }),
 
     // 获取用户视频列表
-    getVideos: (uid: number, page = 1) => 
+    getVideos: (uid: number, page = 1) =>
       this.request('x/space/arc/search', {
-        params: { 
+        params: {
           mid: uid.toString(),
           pn: page.toString(),
           ps: '30'
         }
       }),
+  }
+
+  collection = {
+    // 获取收藏夹列表
   }
 
   // 可以继续添加其他分类的 API

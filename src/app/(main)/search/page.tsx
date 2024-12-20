@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Search as SearchIcon } from "lucide-react"
-import {api} from '@/lib/apiClient'
+import { api } from '@/lib/apiClient'
 import SongItem from "@/components/bus/SongItem";
 
 interface VideoItem {
@@ -26,7 +26,7 @@ const Search = () => {
 
   const handleSearch = async () => {
     if (!keyword.trim()) return
-    
+
     setLoading(true)
     try {
       // 这里替换成实际的 B 站 API 调用
@@ -41,7 +41,7 @@ const Search = () => {
   }
 
   useEffect(() => {
-    fetch('/api/init')
+    fetch('/api/loginlocal')
   }, [])
 
   return (
@@ -61,7 +61,7 @@ const Search = () => {
       </div>
 
       <ScrollArea className="h-[calc(100vh-10rem)]">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {videos.map((video) => (
             <SongItem key={video.id} song={video} />
           ))}
