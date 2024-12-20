@@ -1,0 +1,14 @@
+
+Tech Stack
+
+- React
+- TypeScript
+- pnpm
+- Next.js
+- TailwindCSS
+- Lucide
+- Shadcn
+
+安装shadcn组件的命令是
+pnpm dlx shadcn@latest add component-name
+

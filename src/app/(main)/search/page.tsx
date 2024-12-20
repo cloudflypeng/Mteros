@@ -1,9 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import Image from 'next/image'
+import { useState, useEffect } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { Search as SearchIcon } from "lucide-react"
+import {api} from '@/lib/apiClient'
+import SongItem from "@/components/bus/SongItem";
 
 interface VideoItem {
   id: string
@@ -12,6 +16,7 @@ interface VideoItem {
   author: string
   viewCount: string
   duration: string
+  pic: string
 }
 
 const Search = () => {
@@ -25,9 +30,9 @@ const Search = () => {
     setLoading(true)
     try {
       // 这里替换成实际的 B 站 API 调用
-      const response = await fetch(`/api/bilibili/search?keyword=${encodeURIComponent(keyword)}`)
-      const data = await response.json()
-      setVideos(data.videos)
+      const data = await api.video.search(keyword)
+      console.log(data)
+      setVideos(data)
     } catch (error) {
       console.error("搜索失败:", error)
     } finally {
@@ -35,9 +40,13 @@ const Search = () => {
     }
   }
 
+  useEffect(() => {
+    fetch('/api/init')
+  }, [])
+
   return (
     <div className="container mx-auto py-8">
-      <div className="flex gap-2 mb-8">
+      <div className="flex gap-2 mb-8 h-15">
         <Input
           placeholder="输入关键词搜索视频..."
           value={keyword}
@@ -51,28 +60,13 @@ const Search = () => {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {videos.map((video) => (
-          <div key={video.id} className="border rounded-lg overflow-hidden">
-            <img 
-              src={video.cover} 
-              alt={video.title}
-              className="w-full aspect-video object-cover"
-            />
-            <div className="p-4">
-              <h3 className="font-medium line-clamp-2">{video.title}</h3>
-              <div className="mt-2 text-sm text-gray-500">
-                <p>{video.author}</p>
-                <div className="flex justify-between">
-                  <span>{video.viewCount}播放</span>
-                  <span>{video.duration}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
+      <ScrollArea className="h-[calc(100vh-10rem)]">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {videos.map((video) => (
+            <SongItem key={video.id} song={video} />
+          ))}
+        </div>
+      </ScrollArea>
       {loading && (
         <div className="text-center py-8">
           正在加载...

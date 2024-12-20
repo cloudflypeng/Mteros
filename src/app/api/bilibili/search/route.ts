@@ -13,7 +13,7 @@ export async function GET(request: Request) {
     // 注意：B 站官方 API 可能需要认证，建议使用第三方 API 或自己的代理服务
     const response = await fetch(`https://api.bilibili.com/x/web-interface/search/all/v2?keyword=${encodeURIComponent(keyword)}`)
     const data = await response.json()
-
+    console.log(data)
     // 处理响应数据，转换成前端需要的格式
     const videos = data.data.result.map((item: any) => ({
       id: item.aid,
@@ -27,6 +27,6 @@ export async function GET(request: Request) {
     return NextResponse.json({ videos })
   } catch (error) {
     console.error("B站 API 调用失败:", error)
-    return NextResponse.json({ error: "搜索失败" }, { status: 500 })
+    return NextResponse.json({ error: "搜索失败", videos: [] }, { status: 500  })
   }
 } 
