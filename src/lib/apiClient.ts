@@ -40,6 +40,7 @@ class ApiClient {
       const res = await this.request('x/web-interface/search/type', {
         params: { keyword, search_type: 'video', page: '1', page_size: '42', platform: 'pc', highlight: '1', preload: 'true', com2co: 'true' }
       })
+
       return res.data.result
     },
 
@@ -76,9 +77,18 @@ class ApiClient {
 
   collection = {
     // 获取收藏夹列表
+    getCollection: async (mid: number) => {
+      const res = await this.request('x/v3/fav/folder/created/list-all', {
+        params: { type: '0', up_mid: mid.toString() }
+      })
+      console.log(res, 'res')
+      return res?.data?.list || []
+    }
+
   }
 
   // 可以继续添加其他分类的 API
 }
+
 
 export const api = new ApiClient()

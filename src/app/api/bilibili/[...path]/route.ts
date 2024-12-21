@@ -12,15 +12,18 @@ export async function GET(
     const fullPath = path.join('/')
     const { searchParams } = request.nextUrl
 
-    const cookie = request.headers.get('cookie')
-    console.log(cookie)
+    // 从请求头中获取所有cookie
+    const cookie = request.cookies.getAll()
+      .map(c => `${c.name}=${c.value}`)
+      .join('; ')
+
     // 构建目标 URL
     const targetUrl = new URL(fullPath, BILIBILI_BASE_URL)
     searchParams.forEach((value, key) => {
       targetUrl.searchParams.append(key, value)
     })
 
-    console.log('代理请求:', targetUrl.toString())
+    console.log('代理请求:', targetUrl.toString(), 'cookie', cookie)
 
     const response = await fetch(targetUrl.toString(), {
       headers: {
