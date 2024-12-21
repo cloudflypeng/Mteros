@@ -17,16 +17,16 @@ const Collection = () => {
   const [isPending, startTransition] = useTransition()
   const [collection, setCollection] = useState<CollectionItem[]>([])
 
-  useEffect(() => {
-    fetch('/api/loginlocal').then(res => {
-      console.log(res, 'res')
-    })
-  }, [])
+  // useEffect(() => {
+  //   fetch('/api/loginlocal').then(res => {
+  //     console.log(res, 'res')
+  //   })
+  // }, [])
 
   useEffect(() => {
     startTransition(() => {
       //184327681
-      api.collection.getCollection(184327681).then(res => {
+      api.collection.getCollection(3546821934713371).then(res => {
         setCollection(res)
       })
     })

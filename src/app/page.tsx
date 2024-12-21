@@ -18,6 +18,7 @@ export default function Home() {
           {/* 跳转到搜索 */}
           <li><a href="/search">搜索</a></li>
           <li><a href="/collection">收藏</a></li>
+          <li><a href="/login">登录</a></li>
         </ol>
 
 

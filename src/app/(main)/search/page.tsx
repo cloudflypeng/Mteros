@@ -40,9 +40,9 @@ const Search = () => {
     }
   }
 
-  useEffect(() => {
-    fetch('/api/loginlocal')
-  }, [])
+  // useEffect(() => {
+  //   fetch('/api/loginlocal')
+  // }, [])
 
   return (
     <div className="container mx-auto py-8">
