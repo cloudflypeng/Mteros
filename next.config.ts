@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
       'i0.hdslb.com',  // 建议也添加其他 bilibili 可能用到的域名
       'i1.hdslb.com',
       'i3.hdslb.com',
+      'static.hdslb.com',
       'archive.biliimg.com',
       '*.bilivideo.cn',
       '*.hdslb.com',

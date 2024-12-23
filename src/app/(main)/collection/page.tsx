@@ -39,7 +39,7 @@ const Collection = () => {
   }
 
   return (
-    <div className="container py-8 space-y-4">
+    <div className="container py-8 space-y-4 px-4">
       {collection.map(item => (
         <div
           key={item.id}

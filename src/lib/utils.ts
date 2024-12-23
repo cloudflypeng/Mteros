@@ -10,6 +10,9 @@ export function addHttps(url: string) {
   if (url.startsWith('http://') || url.startsWith('https://')) {
     return url
   }
+  if (url.startsWith('//')) {
+    return `https:${url}`
+  }
   return `https://${url}`
 }
 

@@ -70,6 +70,14 @@ class ApiClient {
       this.request('x/space/acc/info', {
         params: { mid: uid.toString() }
       }),
+    // 搜索用户
+    //https://api.bilibili.com/x/web-interface/wbi/search/type
+    search: async (keyword: string) => {
+      const res = await this.request('x/web-interface/wbi/search/type', {
+        params: { keyword, search_type: 'bili_user', page: '1', }
+      })
+      return res.data.result
+    },
 
     // 获取用户视频列表
     getVideos: (uid: number, page = 1) =>

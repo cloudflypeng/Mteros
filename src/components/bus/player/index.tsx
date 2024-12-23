@@ -13,7 +13,7 @@ import { Howl } from 'howler'
 import { Song } from '@/store'
 import { api } from '@/lib/apiClient'
 import { htmlToString } from '@/lib/utils'
-import { useMediaQuery } from 'react-responsive'
+import { useIsMobile } from "@/hooks/use-mobile"
 
 export function Player() {
 
@@ -26,7 +26,7 @@ export function Player() {
   const [duration, setDuration] = useState(0)
   const [timmer, setTimmer] = useState<NodeJS.Timeout | null>(null)
 
-  const isMobile = useMediaQuery({ query: '(max-width: 768px)' })
+  const isMobile = useIsMobile()
 
   const setSystemMedia = async (song: Song) => {
     if ('mediaSession' in navigator && song) {
@@ -166,7 +166,7 @@ export function Player() {
 
 
 
-  return <section className="fixed bottom-0 left-0 right-0 w-screen bg-background h-[80px] z-50 flex items-center">
+  return <section className="fixed bottom-0 left-0 right-0 w-screen bg-background h-[80px] z-50 flex items-center justify-between">
     {/* left 操作 */}
     <div className="px-4">
       {/* 上一首 */}
