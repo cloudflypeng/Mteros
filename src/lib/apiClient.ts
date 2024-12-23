@@ -44,17 +44,24 @@ class ApiClient {
       return res.data.result
     },
 
-    // 获取视频信息
-    getInfo: (bvid: string) =>
-      this.request('x/web-interface/view', {
-        params: { bvid }
-      }),
-
     // 获取播放地址
-    getPlayUrl: (bvid: string, cid: string) =>
-      this.request('x/player/playurl', {
-        params: { bvid, cid }
-      }),
+    getPlayUrl: async ({ bvid, cid }: { bvid?: string, cid?: string }) => {
+      if (!cid && bvid) {
+        // 先拿cid
+        const res = await this.request('/x/web-interface/view', {
+          params: { bvid }
+        })
+
+        cid = res.data.cid as string
+        const res2 = await this.request('/x/player/playurl', {
+          params: { cid, bvid, fnval: '16' }
+        })
+
+        const url = res2.data.dash?.audio[0].baseUrl || res2.data.dash?.video[0].base_url || res2.data.durl[0].url
+
+        return url
+      }
+    }
   }
 
   user = {

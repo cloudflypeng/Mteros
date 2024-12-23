@@ -1,5 +1,4 @@
 import Image from "next/image";
-import SongItem from "@/components/bus/SongItem";
 
 export default function Home() {
   return (
@@ -20,8 +19,6 @@ export default function Home() {
           <li><a href="/collection">收藏</a></li>
           <li><a href="/login">登录</a></li>
         </ol>
-
-
       </main>
     </div>
   );
