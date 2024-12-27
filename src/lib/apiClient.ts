@@ -4,11 +4,16 @@ type ApiOptions = {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
 }
 
+import { encWbi } from './wbi'
+
 class ApiClient {
   async request(path: string, options: ApiOptions = {}) {
+
+
     const { params, body, method = 'GET' } = options
 
     const url = new URL(`/api/bilibili/${path}`, window.location.origin)
+
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
         url.searchParams.append(key, value)
@@ -18,11 +23,15 @@ class ApiClient {
     console.log('请求:', url.toString())
 
     const response = await fetch(url.toString(), {
-      method,
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: body ? JSON.stringify(body) : undefined,
+      body: JSON.stringify({
+        params,
+        body,
+        method,
+      })
     })
 
     if (!response.ok) {
@@ -66,10 +75,15 @@ class ApiClient {
 
   user = {
     // 获取用户信息
-    getInfo: (uid: number) =>
-      this.request('x/space/acc/info', {
-        params: { mid: uid.toString() }
-      }),
+    getInfo: async (mid: number | string) => {
+
+      const res = await this.request('x/web-interface/card', {
+        params: { mid }
+      })
+      console.log(res, 'res')
+
+      return res.data
+    },
     // 搜索用户
     //https://api.bilibili.com/x/web-interface/wbi/search/type
     search: async (keyword: string) => {
@@ -80,14 +94,25 @@ class ApiClient {
     },
 
     // 获取用户视频列表
-    getVideos: (uid: number, page = 1) =>
-      this.request('x/space/arc/search', {
-        params: {
-          mid: uid.toString(),
-          pn: page.toString(),
-          ps: '30'
-        }
-      }),
+    getVideos: async (params: { mid: number, pn?: number, ps?: number, tid?: number, keyword?: string, order?: string }) => {
+      const defaultParams = {
+        mid: 0,
+        pn: 1,
+        ps: 25,
+        tid: 3,
+        keyword: '',
+        order: 'pubdate',
+      }
+      params = { ...defaultParams, ...params }
+      const web_keys = await this.wbi.getWbiKeys()
+      const img_key = web_keys.img_key
+      const sub_key = web_keys.sub_key
+      const query = encWbi(params, img_key, sub_key)
+      const res = await this.request(`x/space/arc/search${query ? `?${query}` : ''}`, {
+      })
+      return res.data?.list || []
+    }
+
   }
 
   collection = {
@@ -100,6 +125,26 @@ class ApiClient {
       return res?.data?.list || []
     }
 
+  }
+
+  wbi = {
+    getWbiKeys: async () => {
+      const res = await this.request('x/web-interface/nav', {
+      })
+      console.log(res, 'res')
+      const { data: { wbi_img: { img_url, sub_url } } } = res
+
+      return {
+        img_key: img_url.slice(
+          img_url.lastIndexOf('/') + 1,
+          img_url.lastIndexOf('.'),
+        ),
+        sub_key: sub_url.slice(
+          sub_url.lastIndexOf('/') + 1,
+          sub_url.lastIndexOf('.'),
+        ),
+      }
+    }
   }
 
   // 可以继续添加其他分类的 API

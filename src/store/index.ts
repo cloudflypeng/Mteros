@@ -7,7 +7,7 @@ export type Song = {
   artist: string
   cover: string
   ids: Record<string, string | number>
-  url: string
+  url?: string
 }
 export type Singer = {
   mid: number
@@ -31,6 +31,7 @@ type State = {
   // 关注的用户
   followUsers: Singer[]
 
+  setFollowUsers: (users: Singer[]) => void
   setCurrentSong: (song: Song) => void
   addSongToPlayList: (song: Song) => void
   removeSongFromPlayList: (song: Song) => void
@@ -44,6 +45,8 @@ const useStore = create<State>()(
       playList: [],
       currentSong: null,
       followUsers: [],
+
+      setFollowUsers: (users: Singer[]) => set({ followUsers: users }),
       setCurrentSong: (song: Song) => set({ currentSong: song }),
       addSongToPlayList: (song: Song) => {
         set(state => {

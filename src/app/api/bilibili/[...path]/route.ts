@@ -1,38 +1,52 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { base64ToStr } from '../../utils'
 
 const BILIBILI_BASE_URL = 'https://api.bilibili.com'
 
-export async function GET(
+
+export async function POST(
   request: NextRequest,
   context: { params: Promise<{ path: string[] }> }
 ) {
   try {
-    // 获取完整路径
     const { path } = await context.params
     const fullPath = path.join('/')
-    const { searchParams } = request.nextUrl
 
-    // 从请求头中获取所有cookie
-    const cookie = request.cookies.getAll()
-      .map(c => `${c.name}=${c.value}`)
-      .join('; ')
+    // 从请求体中解析参数
+    const { params, method, body } = await request.json()
+
+    let bilicookie = request.cookies.get('bilicookie')?.value as string
+    if (bilicookie) {
+      bilicookie = base64ToStr(bilicookie)
+    }
 
     // 构建目标 URL
     const targetUrl = new URL(fullPath, BILIBILI_BASE_URL)
-    searchParams.forEach((value, key) => {
-      targetUrl.searchParams.append(key, value)
-    })
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        targetUrl.searchParams.append(key, value.toString())
+      })
+    }
 
-    console.log('代理请求:', targetUrl.toString(), 'cookie', cookie)
+    console.log('代理请求:', targetUrl.toString(), 'method:', method, 'cookie:', bilicookie)
 
-    const response = await fetch(targetUrl.toString(), {
+    // 构建请求配置
+    const fetchOptions: RequestInit = {
+      method: method || 'GET',
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
         'Referer': 'https://www.bilibili.com',
-        'Cookie': cookie || '',
+        'Cookie': bilicookie || '',
       },
-    })
+    }
 
+    // 如果是 POST/PUT 方法且有 body，则添加 body 和对应的 Content-Type
+    if ((method === 'POST' || method === 'PUT') && body) {
+      fetchOptions.body = JSON.stringify(body)
+        ; (fetchOptions.headers as Record<string, string>)['Content-Type'] = 'application/json'
+    }
+
+    const response = await fetch(targetUrl.toString(), fetchOptions)
     const data = await response.json()
     return NextResponse.json(data)
 
@@ -44,11 +58,3 @@ export async function GET(
     )
   }
 }
-
-// 如果需要支持其他 HTTP 方法 暂时不处理
-// export async function POST(request: NextRequest, { params }: { params: { path: string[] } }) {
-//   const path = params.path.join('/')
-//   const body = await request.json()
-  
-//   // ... POST 请求处理逻辑
-// }

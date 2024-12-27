@@ -3,16 +3,24 @@
 import { Singer } from "@/store"
 import { Card } from "@/components/ui/card"
 import Image from "next/image"
-
+import { useRouter } from "next/navigation"
 interface SingerItemProps {
   singer: Singer
+  children?: React.ReactNode
 }
 
-const SingerItem: React.FC<SingerItemProps> = ({ singer }) => {
+const SingerItem: React.FC<SingerItemProps> = ({ singer, children }) => {
+
+  const router = useRouter()
+
+  const handleClick = () => {
+    router.push(`/singer/${singer.mid}`)
+  }
 
   return (
     <Card
       className="w-full flex items-center gap-2 rounded-lg"
+      onClick={handleClick}
     >
       <Image src={singer.upic} alt={singer.uname} className="object-cover rounded-lg" width={100} height={100} />
       <div className="flex flex-col gap-2">
@@ -25,6 +33,7 @@ const SingerItem: React.FC<SingerItemProps> = ({ singer }) => {
           <span>{singer.videos}</span>
         </div>
       </div>
+      {children}
     </Card>
   )
 }

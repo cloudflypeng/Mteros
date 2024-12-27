@@ -32,7 +32,7 @@ type SearchResult = {
 }
 
 const Search = () => {
-  const { addSongToPlayList } = useStore()
+  const { addSongToPlayList, setFollowUsers, followUsers } = useStore()
 
   const [keyword, setKeyword] = useState("")
   const [videos, setVideos] = useState<Song[]>([])
@@ -114,8 +114,14 @@ const Search = () => {
     }
   }
 
+  const handleFollow = (user: Singer, e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation()
+    setFollowUsers([...followUsers, user])
+    toast.success('关注成功' + user.uname)
+  }
+
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="container mx-auto py-8 px-4 w-screen">
       <div className="flex gap-2 mb-8 h-15 w-full">
         <Input
           placeholder="输入关键词搜索视频..."
@@ -137,7 +143,7 @@ const Search = () => {
         </TabsList>
         <TabsContent value="video">
           <ScrollArea className="h-[calc(100vh-10rem)]">
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 w-full">
               {videos.map((video) => (
                 <SongItem key={video.id} song={video} onClick={() => handleAddToPlayList(video)} />
               ))}
@@ -148,7 +154,9 @@ const Search = () => {
           <ScrollArea className="h-[calc(100vh-10rem)]">
             <div className="flex flex-col gap-4">
               {users.map((user) => (
-                <SingerItem key={user.mid} singer={user} />
+                <SingerItem key={user.mid} singer={user} >
+                  <Button size="sm" onClick={(e) => handleFollow(user, e)}>关注</Button>
+                </SingerItem>
               ))}
             </div>
           </ScrollArea>

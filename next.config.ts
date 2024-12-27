@@ -10,8 +10,12 @@ const nextConfig: NextConfig = {
       'i3.hdslb.com',
       'static.hdslb.com',
       'archive.biliimg.com',
-      '*.bilivideo.cn',
+      'mcnd.bilivideo.cn',
+      'bilivideo.cn',
+      'mcnd.bilibili.com',
+      'bilivideo.com',
       '*.hdslb.com',
+      '*.bilibili.com',
     ],
   },
 };

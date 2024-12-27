@@ -1,81 +1,123 @@
-
-
 'use client'
 
-import Image from 'next/image'
-import { Card } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Search } from 'lucide-react'
-import { api } from '@/lib/apiClient'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import Image from 'next/image'
+import { toast } from 'sonner'
+import { X, Plus } from 'lucide-react'
+import { api } from '@/lib/apiClient'
 import { addHttps } from '@/lib/utils'
-
-type Singer = {
-  mid: number
-  uname: string
-  upic: string
-  usign: string
-  fans: number
-  videos: number
-}
+import useStore, { Singer } from '@/store/index'
+import { useIsMobile } from "@/hooks/use-mobile"
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Input } from '@/components/ui/input'
+import { Drawer, DrawerContent, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer'
 
 export default function SingerPage() {
+  const router = useRouter()
+  const isMobile = useIsMobile()
 
+  const { followUsers, setFollowUsers } = useStore()
+  const [users, setUsers] = useState<Singer[]>([])
   const [keyword, setKeyword] = useState('')
-  const [singers, setSingers] = useState<Singer[]>([])
+
+  const removeFollowUser = (user: Singer) => {
+    setFollowUsers(followUsers.filter((u) => u.mid !== user.mid))
+    toast.success(`${user.uname}已取消关注`)
+  }
+
+  const gotoSinger = (mid: number) => {
+    router.push(`/singer/${mid}`)
+  }
 
   const handleSearch = async () => {
-    const list = await api.user.search(keyword)
-    setSingers(list.map((item: Singer) => ({
+    console.log('搜索')
+    const users = await api.user.search(keyword)
+    const newUsers = users.map((item: Singer) => ({
       mid: item.mid,
       uname: item.uname,
       upic: addHttps(item.upic),
       usign: item.usign,
       fans: item.fans,
       videos: item.videos
-    })))
+    }))
+    setUsers(newUsers)
+  }
+
+  if (isMobile) {
+    return <div className="h-[calc(100vh-130px)]">
+      <Drawer>
+        <DrawerTrigger>
+          <h1 className="text-[20px] font-bold px-5 flex items-center gap-2">关注歌手 <Plus className="w-5 h-5" /></h1>
+        </DrawerTrigger>
+        <DrawerContent className='h-[60vh] p-5'>
+          <DrawerTitle className='text-2xl font-bold'>搜索歌手</DrawerTitle>
+          <Input placeholder="搜索歌手" value={keyword} onChange={(e) => setKeyword(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSearch()} />
+          <ScrollArea className="h-[calc(100%-30px)">
+            <div className="flex flex-col gap-3">
+              {users.map((user) => (
+                <SingerCardMobile key={user.mid} user={user} onClick={gotoSinger} />
+              ))}
+            </div>
+          </ScrollArea>
+        </DrawerContent>
+      </Drawer>
+      <ScrollArea className="h-[calc(100%-30px)]">
+        <div className="flex flex-col gap-3 flex-wrap p-5 pb-[80px]">
+          {followUsers.map((user) => (
+            <SingerCardMobile key={user.mid} user={user} onClick={gotoSinger} onRemove={removeFollowUser} />
+          ))}
+        </div>
+      </ScrollArea>
+    </div>
   }
 
   return (
-    <div className="container py-6 px-4">
-      <div className="flex items-center gap-4 mb-6">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
-          <Input
-            className="pl-9"
-            placeholder="搜索歌手"
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-          />
-        </div>
-      </div>
-
-      <ScrollArea className="h-screen pb-[80px]">
-        {/* 歌手卡片占位 */}
-        <div className="flex gap-5 flex-wrap w-full mb-[100px]">
-          {singers.map((singer) => (
-            <Card
-              key={singer.mid}
-              className="w-full flex items-center gap-2 rounded-lg"
-            >
-              <Image src={singer.upic} alt={singer.uname} className="object-cover rounded-lg" width={100} height={100} />
-              <div className="flex flex-col gap-2">
-                <div className="text-lg font-bold">{singer.uname}</div>
-                <div className="text-xs text-muted-foreground">{singer.usign}</div>
-                <div className="flex items-center gap-2">
-                  <span>粉丝</span>
-                  <span>{singer.fans}</span>
-                  <span>视频</span>
-                  <span>{singer.videos}</span>
-                </div>
-              </div>
-            </Card>
+    <section className="h-[calc(100vh-130px)]">
+      <h1 className="text-[40px] font-bold px-5">关注歌手</h1>
+      <ScrollArea className="h-[calc(100%-30px)]">
+        <div className="flex gap-5 flex-wrap p-5">
+          {followUsers.map((user) => (
+            <SingerCardPc key={user.mid} user={user} onClick={gotoSinger} onRemove={removeFollowUser} />
           ))}
+          {/* 添加关注 */}
+          {/* <PlusCircle className="w-40 h-40 text-muted-foreground" /> */}
         </div>
-
       </ScrollArea>
-    </div>
+    </section >
   )
+}
+
+function SingerCardPc({ user, onClick, onRemove }: { user: Singer, onClick: (id: number) => void, onRemove: (user: Singer) => void }) {
+
+  const removeFollowUser = (e: React.MouseEvent<Element>) => {
+    e.stopPropagation()
+    onRemove(user)
+  }
+
+  return <div
+    className="flex flex-col w-50 flex-shrink-0 flex-grow-0 gap-2 p-4 
+      transition-all duration-200 cursor-pointer rounded-lg group
+      dark:hover:bg-white/10
+      hover:bg-black/10
+    "
+    key={user.mid}
+    onClick={() => onClick(user.mid)}
+  >
+    <div className="relative">
+      <Image src={user.upic} alt={user.uname} width={150} height={100} className="rounded-full" />
+      <X className="absolute top-0 right-0 opacity-0 group-hover:opacity-50 transition-opacity cursor-pointer" onClick={removeFollowUser} />
+    </div>
+    <div className="">
+      <span className="text-md font-bold group-hover:border-b group-hover:border-b-black">{user.uname}</span>
+      <span className="text-xs text-muted-foreground block opacity-50">粉丝:{user.fans}</span>
+    </div>
+  </div>
+}
+
+function SingerCardMobile({ user, onClick }: { user: Singer, onClick: (id: number) => void, onRemove?: (user: Singer) => void }) {
+  return <div onClick={() => onClick(user.mid)} className="h-[50px] flex items-center gap-2 bg-white/10 rounded-md">
+    <Image src={user.upic} alt={user.uname} width={50} height={50} className="rounded-md" />
+    <span className="text-md">{user.uname}</span>
+  </div>
 }

@@ -1,8 +1,7 @@
 'use client'
 
 import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { ArrowUpDown, Download, Info, Star } from "lucide-react"
+import { ArrowUpDown } from "lucide-react"
 import useStore from "@/store"
 
 export function SongInfo() {
@@ -17,7 +16,7 @@ export function SongInfo() {
           id="curcover"
           src={currentSong?.cover || '/next.svg'}
           alt="cover"
-          className="rounded object-cover"
+          className="rounded-md object-cover"
           width={80}
           height={80}
         />
@@ -29,18 +28,6 @@ export function SongInfo() {
       <div className="truncate flex-1">
         <div className="text-sm text-bold truncate" dangerouslySetInnerHTML={{ __html: currentSong?.name || '暂无歌曲' }}></div>
         <div className="text-sm text-muted-foreground">{currentSong?.artist || '暂无歌手'}</div>
-      </div>
-
-      <div className="flex gap-2 text-sm px-2">
-        <Button variant="ghost" size="icon" className="h-6 w-6">
-          <Download className="h-4 w-4" />
-        </Button>
-        <Button variant="ghost" size="icon" className="h-6 w-6">
-          <Star className="h-4 w-4" />
-        </Button>
-        <Button variant="ghost" size="icon" className="h-6 w-6">
-          <Info className="h-4 w-4" />
-        </Button>
       </div>
     </div>
   )

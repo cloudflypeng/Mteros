@@ -14,9 +14,9 @@ const Login = () => {
   const [countdown, setCountdown] = useState(0)
   const [captchaKey, setCaptchaKey] = useState("")
 
-  useEffect(() => {
-    fetch('/api/init')
-  }, [])
+  // useEffect(() => {
+  //   fetch('/api/init')
+  // }, [])
 
   const handleGeetest = async () => {
 
@@ -123,10 +123,15 @@ const Login = () => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(params)
-    }).then(data => {
-      console.log(data)
-      router.push('/search')
     })
+      .then(res => res.json())
+      .then(res => {
+        const { bilicookie } = res
+        // 存到localstorage
+        localStorage.setItem('bilicookie', bilicookie)
+        // 存到cookie
+        // router.push('/search')
+      })
   }
 
   return (

@@ -25,7 +25,7 @@ export default function SongItem({
 
   const styleBySize = size === 'mini' ? {
     wrapper: 'grid-cols-[5.5rem_1fr_90px]',
-    title: 'text-[12px] font-bold w-full truncate',
+    title: 'text-[12px] font-bold truncate',
     img: 'h-11 w-[44px]'
   } : {
     wrapper: 'grid-cols-[5.5rem_1fr_90px]',
