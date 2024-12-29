@@ -44,7 +44,9 @@ export async function POST(request: NextRequest) {
   }
 
   // 加密
+  console.log('加密前b站cookie:', setCookieHeader)
   const encryptedData = strToBase64(JSON.stringify(setCookieHeader))
+  console.log('加密后b站cookie:', encryptedData)
   // 创建新的响应头
   const responseHeaders = new Headers()
   responseHeaders.set('Content-Type', 'application/json')
@@ -58,6 +60,8 @@ export async function POST(request: NextRequest) {
     secure: true,
     sameSite: 'lax',
   })
+
+  console.log('成功设置 Cookie')
 
   // 返回最终的响应
   return res

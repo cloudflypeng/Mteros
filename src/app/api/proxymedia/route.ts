@@ -1,5 +1,4 @@
 import { NextResponse, NextRequest } from 'next/server'
-import { base64ToStr } from '../utils'
 
 export async function GET(request: NextRequest) {
   const url = new URL(request.url)
@@ -7,7 +6,7 @@ export async function GET(request: NextRequest) {
 
   let bilicookie = request.cookies.get('bilicookie')?.value as string
   if (bilicookie) {
-    bilicookie = base64ToStr(bilicookie)
+    bilicookie = decodeURIComponent(bilicookie)
   }
 
   if (!targetUrl) {

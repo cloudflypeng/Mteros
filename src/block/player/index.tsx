@@ -23,7 +23,7 @@ const formatTime = (time: number) => {
 
 export function Player() {
 
-  const { currentSong, playList, setCurrentSong } = useStore()
+  const { currentSong, playList, setCurrentSong, setUserInfo } = useStore()
   const [isPlaying, setIsPlaying] = useState(false)
   const [howl, setHowl] = useState<Howl | null>(null)
   const [init, setInit] = useState(true)
@@ -34,6 +34,13 @@ export function Player() {
   const [volume, setVolume] = useState(1)
 
   const isMobile = useIsMobile()
+
+  useEffect(() => {
+    api.user.getCurrentUserInfo().then(data => {
+      console.log(data)
+      setUserInfo(data)
+    })
+  }, [])
 
   const setSystemMedia = async (song: Song) => {
     if ('mediaSession' in navigator && song) {
@@ -94,6 +101,8 @@ export function Player() {
     setHowl(newHowl)
     newHowl.play()
   }
+
+
 
   const prevSong = () => {
     const index = playList.findIndex((song) => song.id === currentSong?.id)
@@ -184,43 +193,47 @@ export function Player() {
     )
   }
 
-  return <section className="fixed bottom-0 left-0 right-0 w-[100vw] bg-background h-[80px] z-50 flex items-center">
-    {/* center 歌曲信息 */}
-    <SongInfo />
-    <div className="px-4 w-1/3 flex-shrink-0 flex-grow-0 flex flex-col">
-      {/* 操作 按钮 */}
-      <div className="flex justify-center gap-4 translate-y-[-10px]">
-        {/* 上一首 */}
-        <SkipBack className="h-10 cursor-pointer" onClick={prevSong} />
-        {/* 播放/暂停 */}
-        <div className='bg-white/10 hover:bg-white/20 transition-all duration-200 rounded-full w-10 h-10 flex items-center justify-center'>
-          {isPlaying ? <Pause className="h-6 w-6 cursor-pointer " onClick={togglePlay} /> : <Play className="h-6 w-6 cursor-pointer" onClick={togglePlay} />}
+  return (
+    <section
+      className="fixed bottom-0 left-0 right-0 w-screen z-50
+       backdrop-blur-sm bg-black/10 dark:bg-white/10 h-[80px] flex items-center"
+    >
+      {/* center 歌曲信息 */}
+      <SongInfo />
+      <div className="px-4 w-[40vw] flex-shrink-0 flex-grow-0 flex flex-col">
+        {/* 操作 按钮 */}
+        <div className="flex justify-center gap-4 translate-y--1">
+          {/* 上一首 */}
+          <SkipBack className="h-10 cursor-pointer" onClick={prevSong} />
+          {/* 播放/暂停 */}
+          <div className='bg-white/10 hover:bg-white/20 transition-all duration-200 rounded-full w-10 h-10 flex items-center justify-center'>
+            {isPlaying ? <Pause className="h-6 w-6 cursor-pointer " onClick={togglePlay} /> : <Play className="h-6 w-6 cursor-pointer" onClick={togglePlay} />}
+          </div>
+          {/* 下一首 */}
+          <SkipForward className="h-10 cursor-pointer" onClick={nextSong} />
         </div>
-        {/* 下一首 */}
-        <SkipForward className="h-10 cursor-pointer" onClick={nextSong} />
+        {/* 进度条 */}
+        <div className="flex items-center gap-2">
+          <span>{formatTime(progress)}</span>
+          <Slider
+            className="w-full"
+            value={[progress]} max={duration} onValueChange={(value) => {
+              if (howl) {
+                howl.pause()
+                howl.seek(value[0])
+                howl.play()
+              }
+            }} />
+          <span>{formatTime(duration)}</span>
+        </div>
       </div>
-      {/* 进度条 */}
-      <div className="flex items-center gap-2">
-        <span>{formatTime(progress)}</span>
-        <Slider
-          className="w-full"
-          value={[progress]} max={duration} onValueChange={(value) => {
-            if (howl) {
-              howl.pause()
-              howl.seek(value[0])
-              howl.play()
-            }
-          }} />
-        <span>{formatTime(duration)}</span>
+      {/* right 音量和歌单 */}
+      <div className="flex items-center flex-row-reverse gap-2 pr-6 w-[30vw] flex-1">
+        <PlayList />
+        <VolumeSlider howl={howl} volume={volume} setVolume={setVolume} />
+        <Volume />
       </div>
-    </div>
-    {/* right 音量和歌单 */}
-    <div className="flex items-center flex-row-reverse gap-2 px-10 w-1/3">
-      <PlayList />
-      <VolumeSlider howl={howl} volume={volume} setVolume={setVolume} />
-      <Volume />
-    </div>
-  </section>
+    </section>)
 }
 
 function VolumeSlider({ howl, volume, setVolume }: { howl: Howl | null, volume: number, setVolume: (volume: number) => void }) {

@@ -1,17 +1,15 @@
 "use client"
 import Image from 'next/image'
-import cn from 'classnames'
 import { Song } from '@/store'
+import { Play } from 'lucide-react'
 
 interface SongItemProps {
   song: Song
-  size?: 'default' | 'mini'
   onClick?: () => void
 }
 
 export default function SongItem({
   song,
-  size = 'default',
   onClick
 }: SongItemProps) {
 
@@ -22,50 +20,24 @@ export default function SongItem({
     onClick?.()
   }
 
-
-  const styleBySize = size === 'mini' ? {
-    wrapper: 'grid-cols-[5.5rem_1fr_90px]',
-    title: 'text-[12px] font-bold truncate',
-    img: 'h-11 w-[44px]'
-  } : {
-    wrapper: 'grid-cols-[5.5rem_1fr_90px]',
-    title: 'text-[16px] font-bold truncate',
-    img: 'h-11 w-[44px]'
-  }
+  const cleanName = name?.replace(/<[^>]*>/g, '') || ''
 
   return (
-    <div className={cn('flex gap-3 h-15 w-full mb-3', styleBySize.wrapper)} onClick={clickHandler}>
-      <Image
-        src={cover}
-        alt={name}
-        width={44}
-        height={44}
-        className={cn(styleBySize.img, 'rounded-sm object-cover')}
-        style={{ width: 'auto', height: 'auto' }}
-      />
-      <div className="w-full overflow-auto" title={name}>
-        <div className="h-15 pt-1">
-          <div
-            className={styleBySize.title}
-            dangerouslySetInnerHTML={{ __html: name }}
-          />
-          <div className="flex gap-2">
-            <span className="text-xs opacity-50">
-              {artist}
-            </span>
-          </div>
-        </div>
+    <div className='flex h-[4rem] w-full p-[0.5rem] rounded-md relative group hover:bg-muted/50 cursor-pointer transition-all duration-300 translate-x-0 hover:translate-x-4' onClick={clickHandler}>
+      <div className="relative aspect-square w-[3rem] mr-2">
+        <Image
+          src={cover}
+          alt={name}
+          fill
+          className="object-cover rounded-full group-hover:opacity-50 transition-all duration-300 "
+          sizes="(max-width: 50px) 100vw, 33vw"
+        />
+        <Play className="w-5 h-5 absolute top-4 left-4 opacity-0 group-hover:opacity-100" />
       </div>
-
-      <style jsx>{`
-        .song-item {
-          display: grid;
-          overflow: hidden;
-          align-items: center;
-          flex-shrink: 0;
-          transition: all 0.3s;
-        }
-      `}</style>
+      <div className="flex-1 relative left-0 top-0">
+        <div className='w-full absolute truncate'>{cleanName}</div>
+        <div className='w-full absolute bottom-1 text-xs text-muted-foreground truncate'>{artist}</div>
+      </div>
     </div>
   )
 }

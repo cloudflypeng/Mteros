@@ -18,10 +18,30 @@ export type Singer = {
   videos: number
 }
 
-type UserInfo = {
-  id: string
-  name: string
-  avatar: string
+export type UserInfo = {
+  isLogin: boolean
+  email_verified: number
+  face: string
+  mid: number
+  mobile_verified: number
+  money: number
+  uname: string
+  vipStatus: number
+  vipType: number
+  wbi_img: {
+    img_url: string
+    sub_url: string
+  }
+}
+
+export interface CollectionItem {
+  id: number
+  fid: number
+  mid: number
+  attr: number
+  title: string
+  fav_state: number
+  media_count: number
 }
 
 type State = {
@@ -30,7 +50,11 @@ type State = {
   currentSong: Song | null
   // 关注的用户
   followUsers: Singer[]
+  // 收藏的歌单
+  collection: CollectionItem[]
 
+  setCollection: (collection: CollectionItem[]) => void
+  setUserInfo: (userInfo: UserInfo) => void
   setFollowUsers: (users: Singer[]) => void
   setCurrentSong: (song: Song) => void
   addSongToPlayList: (song: Song) => void
@@ -45,7 +69,11 @@ const useStore = create<State>()(
       playList: [],
       currentSong: null,
       followUsers: [],
+      collection: [],
 
+      setCollection: (collection: CollectionItem[]) => set({ collection }),
+
+      setUserInfo: (userInfo: UserInfo) => set({ userInfo }),
       setFollowUsers: (users: Singer[]) => set({ followUsers: users }),
       setCurrentSong: (song: Song) => set({ currentSong: song }),
       addSongToPlayList: (song: Song) => {

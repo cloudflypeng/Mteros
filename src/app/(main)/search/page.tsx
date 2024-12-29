@@ -1,9 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 
 import { Search as SearchIcon } from "lucide-react"
 import { toast } from "sonner"
+
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -15,7 +17,7 @@ import { addHttps } from "@/lib/utils"
 import { Song, Singer } from "@/store"
 import useStore from "@/store"
 import SongItem from "@/components/bus/SongItem"
-import SingerItem from "@/components/bus/SingerItem"
+import SingerCard from "@/components/bus/SingerCard"
 
 import Vconsole from 'vconsole'
 
@@ -33,6 +35,7 @@ type SearchResult = {
 
 const Search = () => {
   const { addSongToPlayList, setFollowUsers, followUsers } = useStore()
+  const router = useRouter()
 
   const [keyword, setKeyword] = useState("")
   const [videos, setVideos] = useState<Song[]>([])
@@ -114,10 +117,19 @@ const Search = () => {
     }
   }
 
-  const handleFollow = (user: Singer, e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation()
+  const handleFollow = (user: Singer) => {
+    // 校验是否已关注
+    const isFollowed = followUsers.some(u => u.mid === user.mid)
+    if (isFollowed) {
+      toast.error('已关注')
+      return
+    }
     setFollowUsers([...followUsers, user])
     toast.success('关注成功' + user.uname)
+  }
+
+  const handleUserClick = (user: Singer) => {
+    router.push(`/singer/${user.mid}`)
   }
 
   return (
@@ -152,11 +164,9 @@ const Search = () => {
         </TabsContent>
         <TabsContent value="bili_user">
           <ScrollArea className="h-[calc(100vh-10rem)]">
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-wrap gap-4">
               {users.map((user) => (
-                <SingerItem key={user.mid} singer={user} >
-                  <Button size="sm" onClick={(e) => handleFollow(user, e)}>关注</Button>
-                </SingerItem>
+                <SingerCard key={user.mid} cover={user.upic} name={user.uname} desc={user.fans} onClick={() => handleUserClick(user)} onFollow={() => handleFollow(user)} />
               ))}
             </div>
           </ScrollArea>

@@ -9,7 +9,7 @@ export function SongInfo() {
   const { currentSong } = useStore()
 
   return (
-    <div className="flex items-center gap-4 w-1/3 min-w-[120px] h-[calc(100%-16px)] bg-background/80 backdrop-blur px-3 py-1 rounded-md">
+    <div className="flex items-center gap-4 w-[30vw] min-w-[120px] h-[calc(100%-16px)] pl-6 py-1 rounded-md flex-1">
       {/* 主要信息 */}
       <div className="relative shrink-0 cursor-pointer group">
         <Image
@@ -27,7 +27,7 @@ export function SongInfo() {
 
       <div className="truncate flex-1">
         <div className="text-sm text-bold truncate" dangerouslySetInnerHTML={{ __html: currentSong?.name || '暂无歌曲' }}></div>
-        <div className="text-sm text-muted-foreground">{currentSong?.artist || '暂无歌手'}</div>
+        <div className="text-xs text-muted-foreground">{currentSong?.artist || '暂无歌手'}</div>
       </div>
     </div>
   )

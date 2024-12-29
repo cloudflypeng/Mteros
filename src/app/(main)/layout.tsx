@@ -2,7 +2,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { ThemeProvider } from "next-themes"
 
 import { AppSidebar } from "@/components/bus/sidebar"
-import { Player } from "@/components/bus/player"
+import { Player } from "@/block/player"
 import { Toaster } from "@/components/ui/sonner"
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

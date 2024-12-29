@@ -2,6 +2,7 @@
 import { api } from '@/lib/apiClient'
 import { useTransition, useState, useEffect } from 'react'
 import { Folder, PlayCircle } from "lucide-react"
+import useStore from '@/store/index'
 
 interface CollectionItem {
   id: number
@@ -14,17 +15,20 @@ interface CollectionItem {
 }
 
 const Collection = () => {
+  const { userInfo } = useStore()
   const [isPending, startTransition] = useTransition()
   const [collection, setCollection] = useState<CollectionItem[]>([])
 
   useEffect(() => {
+    console.log(userInfo, 'userInfo')
     startTransition(() => {
-      //184327681
-      api.collection.getCollection(3546821934713371).then(res => {
+      const mid = userInfo?.mid as number
+      api.collection.getCollection(mid).then(res => {
         setCollection(res)
       })
     })
-  }, [])
+  }, [userInfo])
+
 
   if (isPending) {
     return <div className="flex items-center justify-center min-h-screen">

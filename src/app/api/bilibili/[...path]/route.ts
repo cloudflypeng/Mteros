@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { base64ToStr } from '../../utils'
 
 const BILIBILI_BASE_URL = 'https://api.bilibili.com'
 
@@ -10,32 +9,42 @@ export async function POST(
 ) {
   try {
     const { path } = await context.params
+    const query = request.nextUrl.searchParams
     const fullPath = path.join('/')
+
+    console.log(path, 'path', query)
 
     // 从请求体中解析参数
     const { params, method, body } = await request.json()
 
     let bilicookie = request.cookies.get('bilicookie')?.value as string
     if (bilicookie) {
-      bilicookie = base64ToStr(bilicookie)
+      bilicookie = decodeURIComponent(bilicookie)
     }
 
     // 构建目标 URL
     const targetUrl = new URL(fullPath, BILIBILI_BASE_URL)
+    const targetQuery = query
+
     if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        targetUrl.searchParams.append(key, value.toString())
+      Object.entries(params).forEach(([key, value]: [string, unknown]) => {
+        if (!query.has(key)) {
+          targetQuery.set(key, value.toString())
+        }
       })
     }
 
-    console.log('代理请求:', targetUrl.toString(), 'method:', method, 'cookie:', bilicookie)
+    targetUrl.search = targetQuery.toString()
+
+    console.log('代理请求:', targetUrl.toString(), '方法:', method, 'bilicookie', bilicookie?.length)
 
     // 构建请求配置
     const fetchOptions: RequestInit = {
       method: method || 'GET',
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Referer': 'https://www.bilibili.com',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+        'Referer': 'https://message.bilibili.com/',
+        'Origin': 'https://message.bilibili.com/',
         'Cookie': bilicookie || '',
       },
     }

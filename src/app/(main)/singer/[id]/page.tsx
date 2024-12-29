@@ -26,11 +26,10 @@ export default function SingerPage({ params }: Props) {
   const { id } = useParams(params)
   const [info, setInfo] = useState<Singer | null>(null)
   const [videos, setVideos] = useState<Song[]>([])
-  const { followUsers, setFollowUsers } = useStore()
+  const { followUsers, setFollowUsers, userInfo } = useStore()
 
   useEffect(() => {
     api.user.getInfo(id).then((res) => {
-      console.log(res, 'res')
 
       const newInfo: Singer = {
         mid: res.card.mid,
@@ -46,7 +45,8 @@ export default function SingerPage({ params }: Props) {
 
   useEffect(() => {
     if (!info) return
-    api.user.getVideos({ mid: Number(id) }).then((res) => {
+    const wbi_img = userInfo?.wbi_img
+    api.user.getVideos({ mid: Number(id) }, wbi_img).then((res) => {
       console.log(res, 'res')
       const list = res.vlist?.map((item: any): Song => ({
         id: item.bvid,

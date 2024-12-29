@@ -74,18 +74,23 @@ class ApiClient {
   }
 
   user = {
-    // 获取用户信息
+    // 获取mid用户信息
     getInfo: async (mid: number | string) => {
 
       const res = await this.request('x/web-interface/card', {
-        params: { mid }
+        params: { mid: mid.toString() }
       })
       console.log(res, 'res')
 
       return res.data
     },
+    getCurrentUserInfo: async () => {
+      const res = await this.request('x/web-interface/nav', {
+      })
+      console.log(res, 'res')
+      return res.data
+    },
     // 搜索用户
-    //https://api.bilibili.com/x/web-interface/wbi/search/type
     search: async (keyword: string) => {
       const res = await this.request('x/web-interface/wbi/search/type', {
         params: { keyword, search_type: 'bili_user', page: '1', }
@@ -94,7 +99,7 @@ class ApiClient {
     },
 
     // 获取用户视频列表
-    getVideos: async (params: { mid: number, pn?: number, ps?: number, tid?: number, keyword?: string, order?: string }) => {
+    getVideos: async (params: { mid: number, pn?: number, ps?: number, tid?: number, keyword?: string, order?: string }, wbi_img) => {
       const defaultParams = {
         mid: 0,
         pn: 1,
@@ -104,11 +109,12 @@ class ApiClient {
         order: 'pubdate',
       }
       params = { ...defaultParams, ...params }
-      const web_keys = await this.wbi.getWbiKeys()
+      const web_keys = this.wbi.getWbiKeys(wbi_img)
       const img_key = web_keys.img_key
       const sub_key = web_keys.sub_key
       const query = encWbi(params, img_key, sub_key)
-      const res = await this.request(`x/space/arc/search${query ? `?${query}` : ''}`, {
+
+      const res = await this.request(`x/space/wbi/arc/search${query ? `?${query}` : ''}`, {
       })
       return res.data?.list || []
     }
@@ -118,21 +124,27 @@ class ApiClient {
   collection = {
     // 获取收藏夹列表
     getCollection: async (mid: number) => {
+      if (!mid) return []
       const res = await this.request('x/v3/fav/folder/created/list-all', {
         params: { type: '0', up_mid: mid.toString() }
       })
       console.log(res, 'res')
       return res?.data?.list || []
+    },
+    // 获取收藏家内视频https://api.bilibili.com/x/v3/fav/resource/list?media_id=3339063381&ps=20&pn=1
+    getCollectionVideos: async (media_id: number, pn: number, ps: number) => {
+      const res = await this.request('x/v3/fav/resource/list', {
+        params: { media_id: media_id.toString(), ps: ps.toString(), pn: pn.toString() }
+      })
+      return res.data || {}
     }
 
   }
 
   wbi = {
-    getWbiKeys: async () => {
-      const res = await this.request('x/web-interface/nav', {
-      })
-      console.log(res, 'res')
-      const { data: { wbi_img: { img_url, sub_url } } } = res
+    getWbiKeys: (wbi_img: { img_url: string, sub_url: string }) => {
+
+      const { img_url, sub_url } = wbi_img
 
       return {
         img_key: img_url.slice(
