@@ -21,7 +21,7 @@ export async function POST(
     console.log(path, 'path', query)
 
     // 从请求体中解析参数
-    const { params, method, body } = await request.json()
+    const { params, method, body }: { params: Record<string, string>, method: string, body: Record<string, string> } = await request.json()
 
     const { needCsrf, headers = {}, ...restBody } = body || {}
 
@@ -40,7 +40,7 @@ export async function POST(
     const targetQuery = query
 
     if (params) {
-      Object.entries(params).forEach(([key, value]: [string, unknown]) => {
+      Object.entries(params).forEach(([key, value]) => {
         if (!query.has(key)) {
           targetQuery.set(key, value.toString())
         }
