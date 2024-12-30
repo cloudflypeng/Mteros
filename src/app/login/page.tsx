@@ -1,10 +1,43 @@
 "use client"
+declare global {
+  interface Window {
+    initGeetest: (
+      config: {
+        gt: string;
+        challenge: string;
+        product: string;
+        offline: boolean;
+      },
+      callback: (captchaObj: GeetestCaptcha) => void
+    ) => void;
+  }
+}
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+
+interface GeetestCaptcha {
+  onSuccess: (callback: () => void) => void;
+  getValidate: () => {
+    geetest_challenge: string;
+    geetest_seccode: string;
+    geetest_validate: string;
+  };
+  appendTo: (selector: string) => void;
+}
+
+interface GeetestResult {
+  challenge: string;
+  seccode: string;
+  validate: string;
+  cid: string;
+  source: string;
+  tel: string;
+  token: string;
+}
 
 const Login = () => {
   const [phone, setPhone] = useState("")
@@ -33,7 +66,7 @@ const Login = () => {
           challenge: geetest.challenge,
           product: 'popup', // 弹出验证
           offline: false
-        }, (captchaObj: any) => {
+        }, (captchaObj: GeetestCaptcha) => {
           captchaObj.onSuccess(() => {
             const result = captchaObj.getValidate()
             const parmas = {
@@ -55,16 +88,18 @@ const Login = () => {
   }
 
 
-  const handleSendCode = (geetestResult: any) => {
+  const handleSendCode = (geetestResult: GeetestResult) => {
     fetch('api/init')
     if (!/^1[3-9]\d{9}$/.test(phone)) {
       alert("请输入正确的手机号")
       return
     }
 
+    const { tel: _tel, ...restGeetestResult } = geetestResult
+    console.log(_tel)
     const params = {
-      tel: Number(phone), // 转换为数字
-      ...geetestResult,
+      tel: Number(phone),
+      ...restGeetestResult,
     }
 
     fetch('/api/login/sendcode', {

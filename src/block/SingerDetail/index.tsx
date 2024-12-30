@@ -6,6 +6,13 @@ import Image from 'next/image'
 import SongItem from '@/components/bus/SongItem'
 import useStore from '@/store'
 
+interface Vlist {
+  bvid: string
+  title: string
+  pic: string
+  author: string
+}
+
 export default function SingerDetail() {
   const { userInfo, setCurrentSong } = useStore()
   const { currentSingerMid } = useBlockStore()
@@ -33,7 +40,7 @@ export default function SingerDetail() {
     const wbi_img = userInfo?.wbi_img
     api.user.getVideos({ mid: Number(currentSingerMid) }, wbi_img).then((res) => {
       console.log(res, 'res')
-      const list = res.vlist?.map((item: any): Song => ({
+      const list = res.vlist?.map((item: Vlist): Song => ({
         id: item.bvid,
         name: item.title,
         cover: item.pic,
