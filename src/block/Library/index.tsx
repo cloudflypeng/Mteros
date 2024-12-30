@@ -9,6 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import SongItem from '@/components/bus/SongItem'
 import SingerCard from '@/components/bus/SingerCard'
 import ColllectionItem from '@/components/bus/Colllection'
+import CreateCollection from './create'
 
 import useBlockStore from '@/store/block'
 
@@ -18,9 +19,8 @@ export default function Library() {
   const { block, setBlock, setCurrentSingerMid, setCurrentCollectionId } = useBlockStore()
   const [isPending, startTransition] = useTransition()
 
-
+  // 获取收藏夹
   useEffect(() => {
-    console.log(userInfo, 'userInfo')
     startTransition(() => {
       const mid = userInfo?.mid as number
       api.collection.getCollection(mid).then(res => {
@@ -61,9 +61,7 @@ export default function Library() {
   return <section className="w-96 bg-black/3 h-[calc(100vh-5rem-80px)] rounded-md bg-white/10">
     <div className="title flex justify-between items-center px-5 py-2 h-[3rem]">
       <h1>我的音乐</h1>
-      <Button>
-        创建歌单
-      </Button>
+      <CreateCollection />
     </div>
     {/* 标签切换 */}
     <Tabs defaultValue="playlist" className="w-full flex-1">

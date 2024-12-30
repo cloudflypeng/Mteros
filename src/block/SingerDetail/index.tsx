@@ -1,18 +1,19 @@
 import useBlockStore from '@/store/block'
-import useStore, { Singer, Song } from '@/store'
+import { Singer, Song } from '@/store'
 import { useEffect, useState } from 'react'
 import { api } from '@/lib/apiClient'
 import Image from 'next/image'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import SongItem from '@/components/bus/SongItem'
+import useStore from '@/store'
 
 export default function SingerDetail() {
+  const { userInfo, setCurrentSong } = useStore()
   const { currentSingerMid } = useBlockStore()
   const [info, setInfo] = useState<Singer | null>(null)
   const [videos, setVideos] = useState<Song[]>([])
-  const { followUsers, setFollowUsers, userInfo, setCurrentSong } = useStore()
 
   useEffect(() => {
+    if (!currentSingerMid) return
     api.user.getInfo(currentSingerMid).then((res) => {
 
       const newInfo: Singer = {

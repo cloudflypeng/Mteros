@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const BILIBILI_BASE_URL = 'https://api.bilibili.com'
 
+function getCookie(name: string, value: string): string {
+  const parts: Array<string> = value.split(`; ${name}=`)
+  if (parts.length === 2)
+    return parts?.pop()?.split(';').shift() || ''
+  return ''
+}
 
 export async function POST(
   request: NextRequest,
@@ -17,9 +23,16 @@ export async function POST(
     // 从请求体中解析参数
     const { params, method, body } = await request.json()
 
+    const { needCsrf, headers = {}, ...restBody } = body || {}
+
     let bilicookie = request.cookies.get('bilicookie')?.value as string
     if (bilicookie) {
       bilicookie = decodeURIComponent(bilicookie)
+    }
+    if (needCsrf) {
+      // 从bilibili获取csrf
+      const csrf = getCookie('bili_jct', bilicookie)
+      restBody.csrf = csrf
     }
 
     // 构建目标 URL
@@ -36,8 +49,6 @@ export async function POST(
 
     targetUrl.search = targetQuery.toString()
 
-    console.log('代理请求:', targetUrl.toString(), '方法:', method, 'bilicookie', bilicookie?.length)
-
     // 构建请求配置
     const fetchOptions: RequestInit = {
       method: method || 'GET',
@@ -46,14 +57,22 @@ export async function POST(
         'Referer': 'https://message.bilibili.com/',
         'Origin': 'https://message.bilibili.com/',
         'Cookie': bilicookie || '',
+        ...headers
       },
     }
 
     // 如果是 POST/PUT 方法且有 body，则添加 body 和对应的 Content-Type
-    if ((method === 'POST' || method === 'PUT') && body) {
-      fetchOptions.body = JSON.stringify(body)
-        ; (fetchOptions.headers as Record<string, string>)['Content-Type'] = 'application/json'
+    if ((method === 'POST' || method === 'PUT') && restBody) {
+      fetchOptions.body = JSON.stringify(restBody)
+      fetchOptions.headers = {
+        ...fetchOptions.headers,
+        'Content-Type': 'application/json',
+        ...headers
+      }
     }
+
+    console.log(fetchOptions.headers, 'fetchOptions')
+    console.log(fetchOptions.body, 'fetchOptions')
 
     const response = await fetch(targetUrl.toString(), fetchOptions)
     const data = await response.json()

@@ -1,22 +1,16 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { useRouter } from "next/navigation"
 
 const Login = () => {
-  const router = useRouter()
   const [phone, setPhone] = useState("")
   const [code, setCode] = useState("")
   const [countdown, setCountdown] = useState(0)
   const [captchaKey, setCaptchaKey] = useState("")
-
-  // useEffect(() => {
-  //   fetch('/api/init')
-  // }, [])
 
   const handleGeetest = async () => {
 

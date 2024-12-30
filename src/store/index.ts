@@ -57,9 +57,11 @@ type State = {
   setUserInfo: (userInfo: UserInfo) => void
   setFollowUsers: (users: Singer[]) => void
   setCurrentSong: (song: Song) => void
+  // 播放列表
   addSongToPlayList: (song: Song) => void
   removeSongFromPlayList: (song: Song) => void
   clearPlayList: () => void
+  setPlayList: (list: Song[]) => void
 }
 
 const useStore = create<State>()(
@@ -89,6 +91,7 @@ const useStore = create<State>()(
       },
       removeSongFromPlayList: (song: Song) => set((state) => ({ playList: state.playList.filter((item) => item.id !== song.id) })),
       clearPlayList: () => set({ playList: [] }),
+      setPlayList: (list: Song[]) => set({ playList: list }),
     }),
     {
       name: 'music-store',

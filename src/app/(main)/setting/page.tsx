@@ -2,11 +2,8 @@
 import { useLocalStorage } from '@/hooks/useLocalStorage'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import useStore from '@/store/index'
 
-import { api } from '@/lib/apiClient'
 const SettingPage = () => {
-  const { setUserInfo } = useStore()
   const [bilicookie, setBilicookie] = useLocalStorage('bilicookie', '')
 
   const handleSave = () => {

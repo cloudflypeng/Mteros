@@ -1,7 +1,9 @@
 type ApiOptions = {
+  headers?: Record<string, string>;
   params?: Record<string, string>;
-  body?: any;
+  body?: object;
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  needCsrf?: boolean;
 }
 
 import { encWbi } from './wbi'
@@ -70,6 +72,20 @@ class ApiClient {
 
         return url
       }
+    },
+    // 添加到收藏夹
+    addToCollection: async (aid: number, media_id: number) => {
+      const res = await this.request('x/v3/fav/resource/deal', {
+        body: {
+          rid: aid,
+          type: 2,
+          add_media_ids: media_id.toString(),
+          needCsrf: true,
+          platform: 'web',
+          gaia_source: 'web_normal'
+        }
+      })
+      return res.data || {}
     }
   }
 
@@ -131,10 +147,25 @@ class ApiClient {
       console.log(res, 'res')
       return res?.data?.list || []
     },
-    // 获取收藏家内视频https://api.bilibili.com/x/v3/fav/resource/list?media_id=3339063381&ps=20&pn=1
+    // 获取收藏家内视频
     getCollectionVideos: async (media_id: number, pn: number, ps: number) => {
       const res = await this.request('x/v3/fav/resource/list', {
         params: { media_id: media_id.toString(), ps: ps.toString(), pn: pn.toString() }
+      })
+      return res.data || {}
+    },
+    // 创建收藏夹
+    createCollection: async (name: string, desc: string) => {
+      const res = await this.request('x/v3/fav/folder/add', {
+        body: {
+          title: name,
+          intro: desc,
+          needCsrf: true,
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+        },
+        method: 'POST',
       })
       return res.data || {}
     }

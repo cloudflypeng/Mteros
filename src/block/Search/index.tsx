@@ -7,6 +7,7 @@ import { Singer, Song } from '@/store/index'
 import { Button } from '@/components/ui/button'
 import SongItem from '@/components/bus/SongItem'
 import SingerCard from '@/components/bus/SingerCard'
+import useStore from '@/store'
 
 type SearchResult = {
   id: string
@@ -23,6 +24,7 @@ type SearchResult = {
 
 export default function Search() {
 
+  const { addSongToPlayList } = useStore()
   const [keyword, setKeyword] = useState('')
   const [searchType, setSearchType] = useState<'song' | 'singer'>('song')
   const [singers, setSingers] = useState<Singer[]>([])
@@ -85,6 +87,10 @@ export default function Search() {
     }
   }
 
+  const handleAddSong = (song: Song) => {
+    addSongToPlayList(song)
+  }
+
   return <div className='flex flex-col w-full h-full p-5 pt-10'>
     <Input
       placeholder='搜索'
@@ -102,7 +108,7 @@ export default function Search() {
         {
           loading ? <div>loading</div>
             : searchType === 'song' ?
-              songs.map((song) => <SongItem key={song.id} song={song} />)
+              songs.map((song) => <SongItem key={song.id} song={song} onClick={() => handleAddSong(song)} />)
               : singers.map((singer) => <SingerCard key={singer.mid} cover={singer.upic} name={singer.uname} desc={singer.fans} size='sm' />)}
       </div>
     </div>

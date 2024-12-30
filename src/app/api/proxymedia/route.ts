@@ -38,6 +38,7 @@ export async function GET(request: NextRequest) {
       },
     })
   } catch (error) {
+    console.log(error)
     return new NextResponse('Error fetching media', { status: 500 })
   }
 } 

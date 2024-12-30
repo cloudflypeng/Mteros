@@ -74,6 +74,10 @@ export function Player() {
     if (!song.url) {
       return
     }
+    if (timmer) {
+      clearInterval(timmer)
+      setTimmer(null)
+    }
 
 
     setSystemMedia(song)
