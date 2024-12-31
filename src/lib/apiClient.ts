@@ -6,6 +6,11 @@ type ApiOptions = {
   needCsrf?: boolean;
 }
 
+type WbiImg = {
+  img_url: string
+  sub_url: string
+}
+
 import { encWbi } from './wbi'
 
 class ApiClient {
@@ -115,7 +120,7 @@ class ApiClient {
     },
 
     // 获取用户视频列表
-    getVideos: async (params: { mid: number, pn?: number, ps?: number, tid?: number, keyword?: string, order?: string }, wbi_img) => {
+    getVideos: async (params: { mid: number, pn?: number, ps?: number, tid?: number, keyword?: string, order?: string }, wbi_img: WbiImg) => {
       const defaultParams = {
         mid: 0,
         pn: 1,
