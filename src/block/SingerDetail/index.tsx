@@ -38,6 +38,7 @@ export default function SingerDetail() {
   useEffect(() => {
     if (!info) return
     const wbi_img = userInfo?.wbi_img
+    if (!wbi_img) return
     api.user.getVideos({ mid: Number(currentSingerMid) }, wbi_img).then((res) => {
       console.log(res, 'res')
       const list = res.vlist?.map((item: Vlist): Song => ({
