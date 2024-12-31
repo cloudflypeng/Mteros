@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { SkipBack, SkipForward, Play, Pause, Volume } from 'lucide-react'
 import { SongInfo } from './songInfo'
-import { PlayList } from './playList'
 import useStore from '@/store'
 import { useEffect } from 'react'
 import { Howl } from 'howler'
@@ -233,7 +232,6 @@ export function Player() {
       </div>
       {/* right 音量和歌单 */}
       <div className="flex items-center flex-row-reverse gap-2 pr-6 w-[30vw] flex-1">
-        <PlayList />
         <VolumeSlider howl={howl} volume={volume} setVolume={setVolume} />
         <Volume />
       </div>
