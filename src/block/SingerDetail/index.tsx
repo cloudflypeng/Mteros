@@ -70,7 +70,7 @@ export default function SingerDetail() {
 
   return <div className='flex flex-col w-full h-full rounded-md overflow-hidden'>
     <div className="flex items-center gap-2 h-[20vh] bg-yellow-700 p-10 text-white">
-      <Image src={info?.upic || ''} alt='头像' width={100} height={100} className="rounded-full" />
+      <Image src={info?.upic || '/next.svg'} alt='头像' width={100} height={100} className="rounded-full" />
       <div className="flex flex-col gap-2">
         <div className="text-2xl font-bold flex items-center gap-2">
           {info?.uname || ''}

@@ -26,7 +26,7 @@ export default function SongItem({
     <div className='flex h-[4rem] w-full p-[0.5rem] rounded-md relative group hover:bg-muted/50 cursor-pointer transition-all duration-300 translate-x-0 hover:translate-x-4' onClick={clickHandler}>
       <div className="relative aspect-square w-[3rem] mr-2">
         <Image
-          src={cover}
+          src={cover || '/next.svg'}
           alt={name}
           fill
           className="object-cover rounded-full group-hover:opacity-50 transition-all duration-300 "

@@ -28,7 +28,7 @@ const SingerCard = ({ cover, name, desc, onClick, onFollow, size = 'md' }: Singe
       <div className='flex h-[4rem] w-full p-[0.5rem] rounded-md relative group hover:bg-muted/50 cursor-pointer' onClick={handleClick}>
         <div className="relative aspect-square w-[3rem] mr-2">
           <Image
-            src={cover}
+            src={cover || '/next.svg'}
             alt={name}
             fill
             className="object-cover rounded-full group-hover:opacity-50 transition-all duration-300 "
@@ -48,7 +48,7 @@ const SingerCard = ({ cover, name, desc, onClick, onFollow, size = 'md' }: Singe
     <div className="flex flex-col hover:bg-white/10 rounded-lg p-4 pb-1 w-48 group relative" onClick={handleClick} >
       <div className="relative aspect-square w-full mb-2">
         <Image
-          src={cover}
+          src={cover || '/next.svg'}
           alt={name}
           fill
           className="object-cover rounded-lg"
