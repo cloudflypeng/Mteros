@@ -26,7 +26,19 @@ export default function Collection() {
     api.collection.getCollectionVideos(Number(currentCollectionId), 1, 20).then(res => {
       const { info, medias } = res
       setInfo(info)
-      setVideos(medias.map(item => {
+      type Item = {
+        bvid: string
+        title: string
+        pic: string
+        author: string
+        intro: string
+        upper: {
+          name: string
+        }
+        bv_id: string
+        cover: string
+      }
+      setVideos(medias.map((item: Item) => {
         return {
           id: item.bvid || item.bv_id,
           ids: {
