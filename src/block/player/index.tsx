@@ -77,12 +77,14 @@ export function Player() {
       clearInterval(timmer)
       setTimmer(null)
     }
-
-
     setSystemMedia(song)
 
+    const response = await fetch(song.url, { credentials: 'include' })
+    console.log(response)
+    const audioUrl = URL.createObjectURL(await response.blob())
+
     const newHowl = new Howl({
-      src: song.url,
+      src: [audioUrl],
       html5: true,
       volume: 1,
       mute: false,
