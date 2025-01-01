@@ -3,6 +3,8 @@ import { useState } from 'react'
 import { api } from '@/lib/apiClient'
 import { addHttps } from '@/lib/utils'
 import { Singer, Song } from '@/store/index'
+import cn from 'classnames'
+import { useIsMobile } from '@/hooks/use-mobile'
 
 import { Button } from '@/components/ui/button'
 import SongItem from '@/components/bus/SongItem'
@@ -30,6 +32,8 @@ export default function Search() {
   const [singers, setSingers] = useState<Singer[]>([])
   const [songs, setSongs] = useState<Song[]>([])
   const [loading, setLoading] = useState(false)
+
+  const isMobile = useIsMobile()
 
 
   const handleSearchSinger = async () => {
@@ -91,7 +95,7 @@ export default function Search() {
     addSongToPlayList(song)
   }
 
-  return <div className='flex flex-col w-full h-full p-5 pt-10'>
+  return <div className={cn('flex flex-col w-full h-full p-5 pt-10', isMobile ? 'pb-[50px]' : '')}>
     <Input
       placeholder='搜索'
       className='bg-white/20'

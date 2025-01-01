@@ -105,8 +105,6 @@ export function Player() {
     newHowl.play()
   }
 
-
-
   const prevSong = () => {
     const index = playList.findIndex((song) => song.id === currentSong?.id)
     if (index !== -1) {
@@ -162,7 +160,7 @@ export function Player() {
 
   if (isMobile) {
     return (
-      <section className="fixed bottom-[1rem] shadow-lg rounded-md mx-[1rem] w-[calc(100%-2rem)] bg-gray-700 h-[60px] z-50 flex items-center">
+      <section className="fixed bottom-[50px] shadow-lg rounded-md mx-[1rem] w-[calc(100%-2rem)] bg-gray-700 h-[60px] z-50 flex items-center">
         {/* 图片 */}
         <Image
           id="curcover"

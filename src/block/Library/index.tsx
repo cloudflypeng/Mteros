@@ -3,12 +3,14 @@ import useStore, { Song, Singer } from '@/store'
 import { useTransition, useEffect } from 'react'
 import { Loader2 } from 'lucide-react'
 import { api } from '@/lib/apiClient'
+import cn from 'classnames'
 
 import { ScrollArea } from '@/components/ui/scroll-area'
 import SongItem from '@/components/bus/SongItem'
 import SingerCard from '@/components/bus/SingerCard'
 import ColllectionItem from '@/components/bus/Colllection'
 import CreateCollection from './create'
+import { useIsMobile } from "@/hooks/use-mobile"
 
 import useBlockStore from '@/store/block'
 
@@ -17,6 +19,7 @@ export default function Library() {
   const { playList, setCurrentSong, followUsers, userInfo, collection, setCollection } = useStore()
   const { block, setBlock, setCurrentSingerMid, setCurrentCollectionId } = useBlockStore()
   const [isPending, startTransition] = useTransition()
+  const isMobile = useIsMobile()
 
   // 获取收藏夹
   useEffect(() => {
@@ -57,9 +60,10 @@ export default function Library() {
     setBlock(newBlock)
   }
 
-  return <section className="w-96 bg-black/3 h-[calc(100vh-5rem-80px)] rounded-md bg-white/10">
+
+  return <section className={cn("w-96 bg-black/3 rounded-md bg-white/10", isMobile ? 'w-full h-full' : 'h-[calc(100vh-5rem-80px)]')}>
     <div className="title flex justify-between items-center px-5 py-2 h-[3rem]">
-      <h1>我的音乐</h1>
+      <h1 className={cn(isMobile ? 'px-5' : 'text-xl')}>我的音乐</h1>
       <CreateCollection />
     </div>
     {/* 标签切换 */}
@@ -70,14 +74,14 @@ export default function Library() {
         <TabsTrigger className='text-xs' value="follow">关注歌手</TabsTrigger>
       </TabsList>
       <TabsContent value="playlist">
-        <ScrollArea className="h-[calc(100vh-12rem-80px)] px-3">
+        <ScrollArea className={cn("px-3", isMobile ? 'h-[calc(100vh-5rem-80px)] ' : 'h-[calc(100vh-12rem-80px)] ')}>
           <div className="px-2">
             {playList.map(item => <SongItem key={item.id} song={item} onClick={() => clickSong(item)} />)}
           </div>
         </ScrollArea>
       </TabsContent>
       <TabsContent value="collection">
-        <ScrollArea className="h-[calc(100vh-12rem-80px)] px-3">
+        <ScrollArea className={cn("px-3", isMobile ? 'h-[calc(100vh-5rem-80px)] ' : 'h-[calc(100vh-12rem-80px)] ')}>
           <div className="px-2">
             {isPending && <div className="flex items-center justify-center h-full">
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -87,7 +91,7 @@ export default function Library() {
         </ScrollArea>
       </TabsContent>
       <TabsContent value="follow">
-        <ScrollArea className="h-[calc(100vh-12rem-80px)] px-3">
+        <ScrollArea className={cn("px-3", isMobile ? 'h-[calc(100vh-5rem-80px)] ' : 'h-[calc(100vh-12rem-80px)] ')}>
           <div className="px-2">
             {followUsers.map(item => <SingerCard key={item.mid} cover={item.upic} name={item.uname} desc={item.fans} size='sm' onClick={() => clickSinger(item)} />)}
           </div>
