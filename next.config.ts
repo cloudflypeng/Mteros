@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
       'bilivideo.com',
       '*.hdslb.com',
       '*.bilibili.com',
+      'mteros.vercel.app'
     ],
   },
 };
