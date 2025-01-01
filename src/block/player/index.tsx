@@ -20,28 +20,32 @@ const formatTime = (time: number) => {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`
 }
 
+let howl: Howl | null = null
+
 export function Player() {
 
   const { currentSong, playList, setCurrentSong, setUserInfo } = useStore()
   const [isPlaying, setIsPlaying] = useState(false)
-  const [howl, setHowl] = useState<Howl | null>(null)
+
   const [init, setInit] = useState(true)
 
   const [progress, setProgress] = useState(0)
   const [duration, setDuration] = useState(0)
-  const [timmer, setTimmer] = useState<NodeJS.Timeout | null>(null)
   const [volume, setVolume] = useState(1)
-  const [isDragging, setIsDragging] = useState(false)
 
   const isMobile = useIsMobile()
 
+  const [loopMode, setLoopMode] = useState<'single' | 'list' | 'random'>('list')
+  const [historyList, setHistoryList] = useState<number[]>([])
+
+  // 获取用户信息
   useEffect(() => {
     api.user.getCurrentUserInfo().then(data => {
-      console.log(data)
       setUserInfo(data)
     })
   }, [])
 
+  // 设置系统媒体信息
   const setSystemMedia = async (song: Song) => {
     if ('mediaSession' in navigator && song) {
       const imgDom = document.getElementById('curcover') as HTMLImageElement
@@ -61,18 +65,13 @@ export function Player() {
   }
 
   const startPlay = async (song: Song) => {
+    console.log('startPlay', song)
     if (howl) {
       howl.stop()
       howl.unload()
     }
-    if (timmer) {
-      clearInterval(timmer)
-      setTimmer(null)
-    }
 
-    setProgress(0)
-    setDuration(0)
-    setHowl(null)
+    howl = null
 
     song.url = await api.video.getPlayUrl({ bvid: song.ids.bvid as string })
     if (song.url) {
@@ -84,64 +83,71 @@ export function Player() {
     setSystemMedia(song)
 
     const newHowl = new Howl({
-      src: [song.url],
+      src: song.url,
       html5: true,
       volume,
       mute: false,
       onplay: () => {
         setIsPlaying(true)
-        setDuration(newHowl.duration())
-        const updateProgress = () => {
-          if (newHowl.playing() && !isDragging) {
-            setProgress(newHowl.seek())
-            requestAnimationFrame(updateProgress)
-          }
+        if (duration === 0) {
+          setDuration(newHowl.duration())
         }
-        requestAnimationFrame(updateProgress)
-      },
-      onpause: () => {
-        setIsPlaying(false)
+
       },
       onend: () => {
         nextSong()
       },
-      onseek: () => {
-        setProgress(newHowl.seek())
-      }
     })
-    setHowl(newHowl)
-    newHowl.play()
+
+    howl = newHowl
+    howl.play()
+
+    const index = playList.findIndex((s) => s.id === song.id)
+    if (index !== historyList[historyList.length - 1]) {
+      setHistoryList([...historyList, index])
+    }
   }
 
   const prevSong = () => {
-    const index = playList.findIndex((song) => song.id === currentSong?.id)
-    if (index !== -1) {
-      setCurrentSong(playList[(index - 1 + playList.length) % playList.length])
+    if (loopMode === 'random') {
+      const newHistory = [...historyList]
+      newHistory.splice(-2)
+      const prevIndex = newHistory[newHistory.length - 1] || 0
+      setHistoryList(newHistory)
+      setCurrentSong(playList[prevIndex])
+    } else {
+      const index = playList.findIndex((song) => song.id === currentSong?.id)
+      if (index !== -1) {
+        setCurrentSong(playList[(index - 1 + playList.length) % playList.length])
+      }
     }
   }
 
   const nextSong = () => {
     const index = playList.findIndex((song) => song.id === currentSong?.id)
     if (index !== -1) {
-      setCurrentSong(playList[(index + 1) % playList.length])
+      let nextIndex = index
+      if (loopMode === 'random') {
+        nextIndex = Math.floor(Math.random() * playList.length)
+      } else if (loopMode === 'single' && currentSong) {
+        startPlay(currentSong)
+        return
+      } else {
+        nextIndex = (index + 1) % playList.length
+      }
+      setCurrentSong(playList[nextIndex])
     }
   }
 
   useEffect(() => {
-    if (timmer) {
-      clearInterval(timmer)
-      setTimmer(null)
-    }
-    console.log('currentSong')
     if (currentSong && !init) {
       startPlay(currentSong)
     }
   }, [currentSong])
-
+  // 初始化,绑定系统
   useEffect(() => {
     setTimeout(() => {
       setInit(false)
-      console.log('init', init)
     }, 1000)
     // 绑定系统媒体按键
     navigator.mediaSession.setActionHandler('previoustrack', () => {
@@ -220,6 +226,17 @@ export function Player() {
           </div>
           {/* 下一首 */}
           <SkipForward className="h-10 cursor-pointer" onClick={nextSong} />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => {
+              const modes: ('single' | 'list' | 'random')[] = ['list', 'single', 'random']
+              const currentIndex = modes.indexOf(loopMode)
+              setLoopMode(modes[(currentIndex + 1) % modes.length])
+            }}
+          >
+            {loopMode === 'single' ? '单曲' : loopMode === 'random' ? '随机' : '列表'}
+          </Button>
         </div>
         {/* 进度条 */}
         <div className="flex items-center gap-2">
@@ -227,17 +244,15 @@ export function Player() {
           <input
             className="w-full"
             type="range"
-            value={progress}
+            // value={progress}
             max={duration}
             step={0.1}
             onChange={(e) => {
-              setProgress(Number(e.target.value))
-              if (howl) {
-                howl.seek(progress)
-              }
-              setIsDragging(false)
+              const newTime = Math.floor(Number(e.target.value))
+              console.log('onChange', newTime, duration, howl?.seek())
+              // setProgress(newTime)
+              howl?.seek(newTime)
             }}
-            onPointerDown={() => setIsDragging(true)}
           />
           <span>{formatTime(duration)}</span>
         </div>

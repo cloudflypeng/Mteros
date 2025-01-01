@@ -8,6 +8,7 @@ import useStore from '@/store'
 import { useInView } from 'react-intersection-observer'
 import { PlayCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { toast } from "sonner"
 
 interface Vlist {
   bvid: string
@@ -17,7 +18,7 @@ interface Vlist {
 }
 
 export default function SingerDetail() {
-  const { userInfo, setCurrentSong, setPlayList } = useStore()
+  const { userInfo, setCurrentSong, setPlayList, followUsers, setFollowUsers } = useStore()
   const { currentSingerMid } = useBlockStore()
   const [info, setInfo] = useState<Singer | null>(null)
 
@@ -46,8 +47,14 @@ export default function SingerDetail() {
   const { ref, inView } = useInView()
 
   useEffect(() => {
-    resetPage()
+
     if (!currentSingerMid) return
+    // 清空上一个
+    setLoading(false)
+    setHasMore(true)
+    setContent([])
+    resetPage()
+
     api.user.getInfo(currentSingerMid).then((res) => {
 
       const newInfo: Singer = {
@@ -107,11 +114,22 @@ export default function SingerDetail() {
     }
   }, [inView, info])
 
-  // const handleFollow = () => {
-  //   if (!info) return
-  //   setFollowUsers([...followUsers, info])
-  //   toast.success('关注成功' + info.uname)
-  // }
+  // 添加关注/取消关注处理函数
+  const handleFollow = () => {
+    if (!info) return
+
+    const isFollowed = followUsers.some(user => user.mid == info.mid)
+
+    if (isFollowed) {
+      // 取消关注
+      setFollowUsers(followUsers.filter(user => user.mid != info.mid))
+      toast.success(`已取消关注 ${info.uname}`)
+    } else {
+      // 添加关注
+      setFollowUsers([...followUsers, info])
+      toast.success(`已关注 ${info.uname}`)
+    }
+  }
 
   const clickSong = (song: Song) => {
     console.log(song, 'song')
@@ -141,6 +159,13 @@ export default function SingerDetail() {
           >
             <PlayCircle className="w-4 h-4" />
             <span>播放全部</span>
+          </Button>
+          <Button
+            onClick={handleFollow}
+            variant="secondary"
+            size="sm"
+          >
+            {followUsers.some(user => user.mid == info?.mid) ? '取消关注' : '关注'}
           </Button>
         </div>
         <div className="text-sm text-muted-foreground text-white">{info?.usign || ''}</div>
