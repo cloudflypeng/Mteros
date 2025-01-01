@@ -25,7 +25,7 @@ const SingerCard = ({ cover, name, desc, onClick, onFollow, size = 'md' }: Singe
 
   if (size === 'sm') {
     return (
-      <div className='flex h-[4rem] w-full p-[0.5rem] rounded-md relative group hover:bg-muted/50 cursor-pointer' onClick={handleClick}>
+      <div className='flex h-[4rem] w-full p-[0.5rem] rounded-md relative group hover:bg-muted/50 cursor-pointer transition-all duration-300 hover:pl-5' onClick={handleClick}>
         <div className="relative aspect-square w-[3rem] mr-2">
           <Image
             src={cover || '/next.svg'}
@@ -36,7 +36,7 @@ const SingerCard = ({ cover, name, desc, onClick, onFollow, size = 'md' }: Singe
           />
           <Play className="w-5 h-5 absolute top-4 left-4 opacity-0 group-hover:opacity-100" />
         </div>
-        <div className="flex-1 relative left-0 top-0 transition-all duration-300 scale-100 group-hover:scale-105">
+        <div className="flex-1 relative left-0 top-0 ">
           <div className='w-full absolute truncate'>{name}</div>
           <div className='w-full absolute bottom-1 text-xs text-muted-foreground truncate'>{desc}</div>
         </div>

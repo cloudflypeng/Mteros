@@ -20,7 +20,12 @@ const useBlockStore = create<State>()(
       currentSingerMid: '',
       currentCollectionId: '',
 
-      setBlock: (block: BlockType[]) => set({ block }),
+      setBlock: (block: BlockType[]) => {
+        set({ block })
+        if (block.length === 0) {
+          set({ block: ['Search'] })
+        }
+      },
       setCurrentSingerMid: (mid: string) => set({ currentSingerMid: mid }),
       setCurrentCollectionId: (id: string) => set({ currentCollectionId: id }),
     }),

@@ -7,6 +7,7 @@ import useStore from '@/store'
 import useBlockStore, { BlockType } from '@/store/block'
 import { Settings, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useRouter } from 'next/navigation'
 
 import SingerDetail from '@/block/SingerDetail'
 import Search from '@/block/Search'
@@ -21,6 +22,7 @@ const BlockMap = {
 
 
 export default function PC() {
+  const router = useRouter()
 
   const { userInfo } = useStore()
   const { block, setBlock } = useBlockStore()
@@ -29,16 +31,20 @@ export default function PC() {
     setBlock(block.filter(item => item !== b))
   }
 
+  const goSetting = () => {
+    router.push('/setting')
+  }
+
 
   return (
-    <section className='pc h-screen w-screen'>
+    <section className='pc h-screen w-screen dark bg-background text-foreground'>
       {/* header */}
       <section className='h-[3rem] w-screen bg-white/10 flex items-center px-5 gap-5'>
         <Image src={userInfo?.face || '/next.svg'} alt="avatar" width={32} height={32} className='rounded-full hover:scale-110 transition-all duration-200' />
-        <Button>
+        {/* <Button>
           安装到桌面
-        </Button>
-        <Button>
+        </Button> */}
+        <Button onClick={goSetting}>
           <Settings />
         </Button>
         <button className='text-xs' onClick={() => setBlock(['Search', 'SingerDetail'])}>

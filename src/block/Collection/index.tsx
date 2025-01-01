@@ -64,7 +64,7 @@ export default function Collection() {
       <Play className='w-6 h-6 cursor-pointer' onClick={handleReplacePlayList} />
     </div>
     <div className='flex flex-col gap-2 relative flex-1'>
-      <div className='absolute inset-0 bg-gradient-to-b from-transparent to-black/50 overflow-y-auto'>
+      <div className='absolute inset-0 bg-gradient-to-b overflow-y-auto'>
         {videos.map(item => {
           return <SongItem key={item.id} song={item} />
         })}

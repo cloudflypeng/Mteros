@@ -31,6 +31,7 @@ export function Player() {
   const [duration, setDuration] = useState(0)
   const [timmer, setTimmer] = useState<NodeJS.Timeout | null>(null)
   const [volume, setVolume] = useState(1)
+  const [isDragging, setIsDragging] = useState(false)
 
   const isMobile = useIsMobile()
 
@@ -60,47 +61,52 @@ export function Player() {
   }
 
   const startPlay = async (song: Song) => {
-    song.url = await api.video.getPlayUrl({ bvid: song.ids.bvid as string })
-    // alert(song.url)
-    // 在前端使用
-    if (song.url) {
-      song.url = `/api/proxymedia?url=${encodeURIComponent(song.url)}`
-    }
-
-    howl?.stop()
-    howl?.unload()
-    setHowl(null)
-    if (!song.url) {
-      return
+    if (howl) {
+      howl.stop()
+      howl.unload()
     }
     if (timmer) {
       clearInterval(timmer)
       setTimmer(null)
     }
+
+    setProgress(0)
+    setDuration(0)
+    setHowl(null)
+
+    song.url = await api.video.getPlayUrl({ bvid: song.ids.bvid as string })
+    if (song.url) {
+      song.url = `/api/proxymedia?url=${encodeURIComponent(song.url)}`
+    }
+
+    if (!song.url) return
+
     setSystemMedia(song)
 
-    const response = await fetch(song.url, { credentials: 'include' })
-    console.log(response)
-    const audioUrl = URL.createObjectURL(await response.blob())
-
     const newHowl = new Howl({
-      src: [audioUrl],
+      src: [song.url],
       html5: true,
-      volume: 1,
+      volume,
       mute: false,
       onplay: () => {
         setIsPlaying(true)
         setDuration(newHowl.duration())
-        setTimmer(setInterval(() => {
-          setProgress(newHowl.seek())
-        }, 1000))
+        const updateProgress = () => {
+          if (newHowl.playing() && !isDragging) {
+            setProgress(newHowl.seek())
+            requestAnimationFrame(updateProgress)
+          }
+        }
+        requestAnimationFrame(updateProgress)
       },
       onpause: () => {
         setIsPlaying(false)
-        if (timmer) {
-          clearInterval(timmer)
-          setTimmer(null)
-        }
+      },
+      onend: () => {
+        nextSong()
+      },
+      onseek: () => {
+        setProgress(newHowl.seek())
       }
     })
     setHowl(newHowl)
@@ -218,15 +224,21 @@ export function Player() {
         {/* 进度条 */}
         <div className="flex items-center gap-2">
           <span>{formatTime(progress)}</span>
-          <Slider
+          <input
             className="w-full"
-            value={[progress]} max={duration} onValueChange={(value) => {
+            type="range"
+            value={progress}
+            max={duration}
+            step={0.1}
+            onChange={(e) => {
+              setProgress(Number(e.target.value))
               if (howl) {
-                howl.pause()
-                howl.seek(value[0])
-                howl.play()
+                howl.seek(progress)
               }
-            }} />
+              setIsDragging(false)
+            }}
+            onPointerDown={() => setIsDragging(true)}
+          />
           <span>{formatTime(duration)}</span>
         </div>
       </div>

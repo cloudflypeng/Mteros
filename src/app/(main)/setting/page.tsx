@@ -2,9 +2,9 @@
 
 import { useState } from 'react'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
-import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { api } from '@/lib/apiClient'
+import { Textarea } from '@/components/ui/textarea'
 
 const SettingPage = () => {
   const [bilicookie, setBilicookie] = useLocalStorage('bilicookie', '')
@@ -30,16 +30,36 @@ const SettingPage = () => {
     })
   }
 
+  const handleClear = () => {
+    setBilicookie('')
+    setCheckInfo('')
+  }
+
   return (
-    <section className="flex flex-col gap-4 p-10">
-      <h1>设置</h1>
-      <div className="flex flex-col md:flex-row gap-4">
-        <Input type="text" placeholder="请输入b站cookie" value={bilicookie} onChange={(e) => setBilicookie(e.target.value)} />
-        <Button onClick={handleSave}>保存</Button>
-      </div>
-      <div className="flex flex-col md:flex-row gap-4">
-        <Button onClick={handleCheck}>检查</Button>
-        <div>{checkInfo}</div>
+    <section className="container max-w-3xl mx-auto py-8 px-4">
+      <h1 className="text-2xl font-bold mb-6">设置</h1>
+      <div className="space-y-6">
+        <div className="flex flex-col gap-4">
+          <Textarea
+            placeholder="请输入b站cookie"
+            value={bilicookie}
+            onChange={(e) => setBilicookie(e.target.value)}
+            className="min-h-[100px]"
+          />
+          <div className="flex gap-2">
+            <Button onClick={handleSave} className="flex-1">保存</Button>
+            <Button onClick={handleClear} variant="outline" className="flex-1">清除</Button>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <Button onClick={handleCheck} className="w-full">检查</Button>
+          {checkInfo && (
+            <div className="p-4 rounded-lg bg-muted/50 break-all">
+              {checkInfo}
+            </div>
+          )}
+        </div>
       </div>
     </section>
   )

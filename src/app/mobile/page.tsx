@@ -28,7 +28,7 @@ export default function Mobile() {
   // }, [])
 
   return (
-    <section className='flex flex-col h-screen'>
+    <section className='flex flex-col h-screen dark bg-background text-foreground'>
       <div className='flex-1'>
         {currentBlock && BlockMap[currentBlock]}
       </div>
