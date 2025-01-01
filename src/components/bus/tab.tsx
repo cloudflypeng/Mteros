@@ -1,4 +1,4 @@
-
+'use client'
 import { Search, Star, ListMusic } from 'lucide-react'
 import useBlockStore, { BlockType } from '@/store/mblock'
 

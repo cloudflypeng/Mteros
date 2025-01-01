@@ -5,13 +5,13 @@ import Search from '@/block/Search'
 import SingerDetail from '@/block/SingerDetail'
 import Collection from '@/block/Collection'
 import { Player } from '@/block/player'
-import { useEffect } from 'react'
+// import { useEffect } from 'react'
 
 import useBlockStore from '@/store/mblock'
-import VConsole from 'vconsole';
+// import VConsole from 'vconsole';
 
 
-const blockMap = {
+const BlockMap = {
   'Library': <Library />,
   'Search': <Search />,
   'SingerDetail': <SingerDetail />,
@@ -23,14 +23,14 @@ export default function Mobile() {
 
   const currentBlock = blockHistory[blockHistory.length - 1]
 
-  useEffect(() => {
-    new VConsole()
-  }, [])
+  // useEffect(() => {
+  //   new VConsole()
+  // }, [])
 
   return (
     <section className='flex flex-col h-screen'>
       <div className='flex-1'>
-        {currentBlock && blockMap[currentBlock]}
+        {currentBlock && BlockMap[currentBlock]}
       </div>
       <Tab />
       <Player />
