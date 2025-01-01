@@ -1,5 +1,5 @@
 'use client'
-import Tab from './tab'
+import Tab from '../../components/bus/tab'
 import Library from '@/block/Library'
 import Search from '@/block/Search'
 import SingerDetail from '@/block/SingerDetail'
